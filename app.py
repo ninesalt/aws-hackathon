@@ -94,6 +94,14 @@ def create_model(features, output, destination, target,
     return model
 
 
+# create models given features and output
+m1 = create_model(['lat_dec', 'lon_dec'], 'material',
+                  'Location -> Minerals', filtered_minerals)
+
+m2 = create_model(['lat_dec', 'lon_dec'], 'commod',
+                  'Location -> Commodity', filtered_coms)
+
+
 def predict(model_input, model_type, m1=m1, m2=m2, filtered_minerals=filtered_minerals,
             commodity_classes=commodity_classes):
 
@@ -109,13 +117,6 @@ def predict(model_input, model_type, m1=m1, m2=m2, filtered_minerals=filtered_mi
         return pd.DataFrame({'{}'.format(model_type): filtered_coms, 'Probability (%)': prediction * 100})
 
 
-# create models given features and output
-m1 = create_model(['lat_dec', 'lon_dec'], 'material',
-                  'Location -> Minerals', filtered_minerals)
-
-m2 = create_model(['lat_dec', 'lon_dec'], 'commod',
-                  'Location -> Commodity', filtered_coms)
-
 # pickle.dump(m1, open('loc-mat.pkl', 'wb'))
 # pickle.dump(m2, open('loc-com.pkl', 'wb'))
 
@@ -124,6 +125,7 @@ m2 = create_model(['lat_dec', 'lon_dec'], 'commod',
 # m4 = create_model(['material'], 'commod', 'Mineral -> Commodity', filtered_coms)
 # m1 = create_model(['commod'], 'material', 'Commodity -> Minerals', filtered_minerals)
 # m5 = create_model(None, 'commod', 'Conditions -> commodity', filtered_coms, conditions_vec)
+
 
 app = Flask(__name__)
 
