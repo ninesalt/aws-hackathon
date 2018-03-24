@@ -7,6 +7,7 @@ from sklearn.ensemble import RandomForestClassifier
 import pandas as pd
 import numpy as np
 from flask import Flask
+from flask_cors import CORS
 from flask import request, jsonify
 
 directory = './rdbms-comp/rdbms-tab-all/'
@@ -123,6 +124,7 @@ def predict(model_input, model_type, m1=m1, m2=m2, filtered_minerals=filtered_mi
 
 
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route('/isAlive')
