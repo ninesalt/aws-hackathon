@@ -3,15 +3,13 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import classification_report, accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import RandomForestClassifier
 import pandas as pd
 import numpy as np
 from flask import Flask
 from flask import request, jsonify
-import pickle
 
-directory = 'https://s3.amazonaws.com/geoearth/'
+directory = './rdbms-comp/rdbms-tab-all/'
 locationsFile = directory + 'Coords.txt'
 mineralsFile = directory + 'Materials.txt'
 commoditiesFile = directory + 'Production_detail.txt'
@@ -116,10 +114,7 @@ def predict(model_input, model_type, m1=m1, m2=m2, filtered_minerals=filtered_mi
         prediction = m2.predict_proba(model_input)[0]
         return pd.DataFrame({'{}'.format(model_type): filtered_coms, 'Probability (%)': prediction * 100})
 
-
-# pickle.dump(m1, open('loc-mat.pkl', 'wb'))
-# pickle.dump(m2, open('loc-com.pkl', 'wb'))
-
+# other models
 
 # m3 = create_model(['lat_dec', 'lon_dec', 'material'], 'commod', 'Location + mineral -> Commodity', filtered_coms)
 # m4 = create_model(['material'], 'commod', 'Mineral -> Commodity', filtered_coms)
@@ -130,6 +125,11 @@ def predict(model_input, model_type, m1=m1, m2=m2, filtered_minerals=filtered_mi
 app = Flask(__name__)
 
 
+@app.route('/isAlive')
+def index():
+    return "true"
+
+
 @app.route('/predict/', methods=['GET'])
 def get_prediction():
 
@@ -137,14 +137,11 @@ def get_prediction():
     coord_long = float(request.args.get('long'))
     features = [coord_lat, coord_long]
 
-    # m1 = pickle.load(open('loc-mat.pkl', 'rb'))
-    # m2 = pickle.load(open('loc-com.pkl', 'rb'))
-
-    prediction_m1 = predict(features, 'mineral')
-    prediction_m2 = predict(features, 'commodity')
+    prediction_m1 = predict(features, 'mineral').to_json()
+    prediction_m2 = predict(features, 'commodity').to_json()
 
     preds = {'minerals': prediction_m1, 'coms': prediction_m2}
-    return jsonify(preds)
+    return str(preds)
 
 
 if __name__ == '__main__':
