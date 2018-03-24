@@ -143,7 +143,7 @@ def get_prediction():
     prediction_m2 = predict(features, 'commodity').to_json()
 
     preds = {'minerals': prediction_m1, 'coms': prediction_m2}
-    return str(preds)
+    return jsonify(preds)
 
 
 if __name__ == '__main__':
